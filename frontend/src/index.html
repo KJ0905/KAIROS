@@ -1,0 +1,232 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio AI</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <div class="app">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-top">
+                <div class="brand">
+                    <!-- <img src="/logo.png" alt="AI logo" class="app-logo-1"> -->
+                    <!-- <span class="brand-icon">*</span> -->
+                    <span>KAIROS</span>
+                </div>
+                <!-- <button id="sidebar-toggle" class="icon-btn" title="Close sidebar">☰</button> -->
+            </div>
+
+            <button id="new-chat-btn" class="new-chat-btn">
+                <span>＋</span> New chat
+            </button>
+
+            <a
+                href="/api/portfolio/resume"
+                class="sidebar-resume-link"
+                target="_blank"
+                rel="noopener noreferrer"
+            >
+                <span>📄</span>
+                <span>View Current Resume</span>
+            </a>
+
+            <button type="button" id="why-hire-btn" class="sidebar-resume-link">
+                <span>✦</span>
+                <span>Why Hire This Candidate?</span>
+            </button>
+            
+            <!-- <section class="sidebar-section">
+                <div class="section-heading">PORTFOLIO</div>
+                <div id="candidate-list">
+                    <div id="portfolio-status" class="muted">
+                        Loading portfolio...
+                    </div>
+                </div>
+            </section> -->
+
+            <section class="sidebar-section">
+                <div class="section-heading">RECENT CHATS</div>
+                <div id="conversation-list"></div>
+            </section>
+
+            <div class="sidebar-bottom">
+                <button id="theme-toggle" class="sidebar-action">
+                    <span id="theme-icon">☾</span>
+                    <span id="theme-label">Dark mode</span>
+                </button>
+
+                <button id="admin-open-btn" class="sidebar-action">
+                    <span>⚙</span>
+                    <span>Admin login</span>
+                </button>
+
+                <div id="admin-panel" hidden>
+                    <div class="section-heading">RESUME MANAGEMENT</div>
+
+                    <p id="admin-status" class="muted">
+                        Admin login required.
+                    </p>
+
+                    <form id="admin-login-form">
+                        <input
+                            id="admin-username"
+                            type="text"
+                            placeholder="Admin username"
+                            autocomplete="username"
+                            required
+                        >
+                        <input
+                            id="admin-password"
+                            type="password"
+                            placeholder="Admin password"
+                            autocomplete="current-password"
+                            required
+                        >
+                        <button class="primary-btn" type="submit">
+                            Log in
+                        </button>
+                    </form>
+
+                    <div id="admin-resume-controls" hidden>
+                        <label for="admin-resume-upload" class="sidebar-action">
+                            ＋ Upload / replace resume
+                        </label>
+                        <input
+                            id="admin-resume-upload"
+                            type="file"
+                            accept=".pdf,application/pdf"
+                            hidden
+                        >
+
+                        <p id="admin-upload-status" class="muted"></p>
+
+                        <button
+                            id="admin-delete-resume"
+                            class="sidebar-action danger-action"
+                            type="button"
+                        >
+                            Delete portfolio resume
+                        </button>
+
+                        <button
+                            id="admin-logout-btn"
+                            class="sidebar-action"
+                            type="button"
+                        >
+                            Log out
+                        </button>
+                    </div>
+                </div>
+
+                <div class="profile">
+                    <div class="profile-avatar">AI</div>
+                    <div>
+                        <strong>KAIROS</strong>
+                        <small>Kunal's AI Recruitment & Opportunity System</small>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <main class="main">
+            <header class="topbar">
+                <div class="topbar-left">
+                    <button id="mobile-menu" class="icon-btn" title="Open sidebar">☰</button>
+                    <span>Portfolio Assistant</span>
+                </div>
+                <button id="job-panel-toggle" class="topbar-action">
+                    Job match
+                </button>
+            </header>
+
+            <section id="welcome" class="welcome">
+                <img src="/logo.png" alt="AI logo" class="app-logo">
+                <!-- <div class="welcome-symbol">*</div> -->
+                <h1>What would you like to know?</h1>
+                <p>Explore my skills, projects, education, experience, and job fit.</p>
+
+                <div class="suggestions">
+                    <button class="suggestion" data-question="Summarize the portfolio owner's resume.">
+                        <strong>Resume summary</strong>
+                        <span>Get an overview of my background</span>
+                    </button>
+
+                    <button class="suggestion" data-question="What are your strongest technical skills?">
+                        <strong>Technical skills</strong>
+                        <span>Explore my skills and technologies</span>
+                    </button>
+
+                    <button class="suggestion" data-question="Explain your most relevant projects.">
+                        <strong>Project experience</strong>
+                        <span>Learn about my practical work</span>
+                    </button>
+
+                    <button class="suggestion" data-question="How does your experience match a software engineering internship?">
+                        <strong>Internship fit</strong>
+                        <span>Explore my career fit</span>
+                    </button>
+                </div>
+            </section>
+
+            <section
+                id="chat-messages"
+                class="chat-messages"
+                aria-live="polite"
+            ></section>
+
+            <div class="composer-area">
+                <div id="job-panel" class="job-panel" hidden>
+                    <div class="job-panel-header">
+                        <strong>Job description match</strong>
+                        <button
+                            id="job-panel-close"
+                            class="icon-btn"
+                            title="Close"
+                        >×</button>
+                    </div>
+
+                    <textarea
+                        id="job-description"
+                        placeholder="Paste a job description here (at least 30 characters)..."
+                    ></textarea>
+
+                    <div class="job-actions">
+                        <button id="match-btn" class="primary-btn">
+                            Analyze match
+                        </button>
+                        <span id="match-status" class="muted"></span>
+                    </div>
+
+                    <div id="match-results"></div>
+                </div>
+
+                <form id="chat-form" class="chat-composer">
+                    <textarea
+                        id="question"
+                        rows="1"
+                        placeholder="Ask me about my portfolio..."
+                        required
+                    ></textarea>
+                    <button id="send-btn" type="submit" title="Send message">
+                        ↑
+                    </button>
+                    <button id="stop-button" type="button" title="Stop generating" hidden>
+                        <span class="stop-icon"></span>
+                    </button>
+                </form>
+
+                <p class="composer-note">
+                    AI can make mistakes. Verify important details against the resume.
+                </p>
+            </div>
+        </main>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.2.6/dist/purify.min.js"></script>
+    <script src="/app.js"></script>
+</body>
+</html>
