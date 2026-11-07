@@ -948,6 +948,229 @@ const adminResumeUpload = document.getElementById("admin-resume-upload");
 const adminUploadStatus = document.getElementById("admin-upload-status");
 const adminDeleteResume = document.getElementById("admin-delete-resume");
 const adminLogoutBtn = document.getElementById("admin-logout-btn");
+// Personal Knowledge Base elements
+const personalProfileForm = document.getElementById("personal-profile-form");
+const personalProfileStatus = document.getElementById("personal-profile-status");
+const deletePersonalProfileBtn = document.getElementById("delete-personal-profile");
+
+const profileFields = {
+    introduction: document.getElementById("profile-introduction"),
+    personality: document.getElementById("profile-personality"),
+    strengths: document.getElementById("profile-strengths"),
+    improvements: document.getElementById("profile-improvements"),
+    softSkills: document.getElementById("profile-soft-skills"),
+    communication: document.getElementById("profile-communication"),
+    teamwork: document.getElementById("profile-teamwork"),
+    leadership: document.getElementById("profile-leadership"),
+    problemSolving: document.getElementById("profile-problem-solving"),
+    adaptability: document.getElementById("profile-adaptability"),
+
+    experienceTitle: document.getElementById("profile-experience-title"),
+    experienceSituation: document.getElementById("profile-experience-situation"),
+    experienceAction: document.getElementById("profile-experience-action"),
+    experienceResult: document.getElementById("profile-experience-result"),
+    experienceSkills: document.getElementById("profile-experience-skills"),
+
+    workStyle: document.getElementById("profile-work-style"),
+    preferredRoles: document.getElementById("profile-preferred-roles"),
+    careerGoals: document.getElementById("profile-career-goals"),
+};
+
+// Preserve experience stories beyond the first one
+let additionalPersonalExperiences = [];
+function linesToArray(value) {
+    return value
+        .split("\n")
+        .map(item => item.trim())
+        .filter(item => item.length > 0);
+}
+
+
+function arrayToLines(value) {
+    return Array.isArray(value) ? value.join("\n") : "";
+}
+
+
+function clearPersonalProfileForm() {
+    Object.values(profileFields).forEach(field => {
+        if (field) {
+            field.value = "";
+        }
+    });
+
+    additionalPersonalExperiences = [];
+}
+
+
+function populatePersonalProfile(profile) {
+    profileFields.introduction.value = profile.introduction || "";
+
+    profileFields.personality.value = arrayToLines(profile.personality_traits);
+    profileFields.strengths.value = arrayToLines(profile.strengths);
+    profileFields.improvements.value = arrayToLines(profile.areas_to_improve);
+    profileFields.softSkills.value = arrayToLines(profile.soft_skills);
+
+    profileFields.communication.value = arrayToLines(profile.communication);
+    profileFields.teamwork.value = arrayToLines(profile.teamwork);
+    profileFields.leadership.value = arrayToLines(profile.leadership);
+    profileFields.problemSolving.value = arrayToLines(profile.problem_solving);
+    profileFields.adaptability.value = arrayToLines(profile.adaptability_and_learning);
+
+    profileFields.workStyle.value = arrayToLines(profile.work_style);
+    profileFields.preferredRoles.value = arrayToLines(profile.preferred_roles);
+    profileFields.careerGoals.value = arrayToLines(profile.career_goals);
+
+    const experiences = profile.experiences || [];
+    const firstExperience = experiences[0] || {};
+
+    profileFields.experienceTitle.value = firstExperience.title || "";
+    profileFields.experienceSituation.value = firstExperience.situation || "";
+    profileFields.experienceAction.value = firstExperience.action || "";
+    profileFields.experienceResult.value = firstExperience.result || "";
+    profileFields.experienceSkills.value = arrayToLines(
+        firstExperience.skills_demonstrated
+    );
+
+    // Keep remaining experiences so saving does not erase them.
+    additionalPersonalExperiences = experiences.slice(1);
+}
+async function loadPersonalProfile() {
+    try {
+        const response = await fetch("/api/admin/personal-profile");
+
+        if (!response.ok) {
+            throw new Error("Could not load personal knowledge.");
+        }
+
+        const data = await response.json();
+
+        populatePersonalProfile(data.profile);
+
+        personalProfileStatus.textContent =
+            "Personal knowledge loaded successfully.";
+
+    } catch (error) {
+        personalProfileStatus.textContent = error.message;
+        console.error("Load personal profile error:", error);
+    }
+}
+
+
+async function savePersonalProfile(event) {
+    event.preventDefault();
+
+    personalProfileStatus.textContent = "Saving...";
+
+    const experienceTitle = profileFields.experienceTitle.value.trim();
+
+    const currentExperience = experienceTitle
+        ? [{
+            title: experienceTitle,
+            situation: profileFields.experienceSituation.value.trim() || null,
+            action: profileFields.experienceAction.value.trim() || null,
+            result: profileFields.experienceResult.value.trim() || null,
+            skills_demonstrated: linesToArray(
+                profileFields.experienceSkills.value
+            )
+        }]
+        : [];
+
+    const profile = {
+        introduction: profileFields.introduction.value.trim() || null,
+
+        personality_traits: linesToArray(profileFields.personality.value),
+        strengths: linesToArray(profileFields.strengths.value),
+        areas_to_improve: linesToArray(profileFields.improvements.value),
+        soft_skills: linesToArray(profileFields.softSkills.value),
+
+        communication: linesToArray(profileFields.communication.value),
+        teamwork: linesToArray(profileFields.teamwork.value),
+        leadership: linesToArray(profileFields.leadership.value),
+        problem_solving: linesToArray(profileFields.problemSolving.value),
+        adaptability_and_learning: linesToArray(
+            profileFields.adaptability.value
+        ),
+
+        experiences: [
+            ...currentExperience,
+            ...additionalPersonalExperiences
+        ],
+
+        work_style: linesToArray(profileFields.workStyle.value),
+        preferred_roles: linesToArray(profileFields.preferredRoles.value),
+        career_goals: linesToArray(profileFields.careerGoals.value)
+    };
+
+    try {
+        const response = await fetch("/api/admin/personal-profile", {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(profile)
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.detail || "Failed to save personal knowledge.");
+        }
+
+        populatePersonalProfile(data.profile);
+
+        personalProfileStatus.textContent =
+            "Personal knowledge saved successfully!";
+
+    } catch (error) {
+        personalProfileStatus.textContent = error.message;
+        console.error("Save personal profile error:", error);
+    }
+}
+
+
+async function removePersonalProfile() {
+    const confirmed = confirm(
+        "Are you sure you want to delete all personal knowledge?"
+    );
+
+    if (!confirmed) return;
+
+    personalProfileStatus.textContent = "Deleting...";
+
+    try {
+        const response = await fetch("/api/admin/personal-profile", {
+            method: "DELETE"
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.detail || "Failed to delete personal knowledge.");
+        }
+
+        clearPersonalProfileForm();
+
+        personalProfileStatus.textContent =
+            "Personal knowledge deleted successfully.";
+
+    } catch (error) {
+        personalProfileStatus.textContent = error.message;
+        console.error("Delete personal profile error:", error);
+    }
+}
+if (personalProfileForm) {
+    personalProfileForm.addEventListener(
+        "submit",
+        savePersonalProfile
+    );
+}
+
+if (deletePersonalProfileBtn) {
+    deletePersonalProfileBtn.addEventListener(
+        "click",
+        removePersonalProfile
+    );
+}
 
 async function refreshAdminStatus() {
     try {
@@ -976,6 +1199,8 @@ async function refreshAdminStatus() {
             adminUploadStatus.textContent = portfolio.available
                 ? `Current resume: ${portfolio.original_filename}`
                 : "No resume uploaded yet.";
+
+            await loadPersonalProfile();
         }
     } catch (error) {
         console.error("Could not check admin session:", error);

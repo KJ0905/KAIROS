@@ -24,6 +24,40 @@ class ProfileLinks(BaseModel):
     other_links: list[str] = Field(default_factory=list)
 
 
+class PersonalExperience(BaseModel):
+    title: str
+    situation: str | None = None
+    action: str | None = None
+    result: str | None = None
+    skills_demonstrated: list[str] = Field(default_factory=list)
+
+
+class PersonalProfile(BaseModel):
+    # General information
+    introduction: str | None = None
+    personality_traits: list[str] = Field(default_factory=list)
+
+    # Personal strengths and development areas
+    strengths: list[str] = Field(default_factory=list)
+    areas_to_improve: list[str] = Field(default_factory=list)
+
+    # Soft skills
+    soft_skills: list[str] = Field(default_factory=list)
+    communication: list[str] = Field(default_factory=list)
+    teamwork: list[str] = Field(default_factory=list)
+    leadership: list[str] = Field(default_factory=list)
+    problem_solving: list[str] = Field(default_factory=list)
+    adaptability_and_learning: list[str] = Field(default_factory=list)
+
+    # Evidence and experiences
+    experiences: list[PersonalExperience] = Field(default_factory=list)
+
+    # Career preferences
+    work_style: list[str] = Field(default_factory=list)
+    preferred_roles: list[str] = Field(default_factory=list)
+    career_goals: list[str] = Field(default_factory=list)
+
+
 class Resume(BaseModel):
     name: str | None = None
     email: str | None = None

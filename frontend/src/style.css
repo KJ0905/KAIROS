@@ -1370,3 +1370,48 @@ body {
 }
 
 
+.personal-profile-section {
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border-color, #444);
+}
+
+#personal-profile-form {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    margin-top: 12px;
+}
+
+#personal-profile-form label {
+    font-size: 13px;
+    font-weight: 600;
+    margin-top: 5px;
+}
+
+#personal-profile-form input,
+#personal-profile-form textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 9px 10px;
+    border: 1px solid var(--border-color, #555);
+    border-radius: 8px;
+    background: var(--input-bg, transparent);
+    color: inherit;
+    font: inherit;
+    font-size: 13px;
+    resize: vertical;
+}
+
+#personal-profile-form textarea {
+    min-height: 55px;
+}
+
+#personal-profile-form button {
+    width: 100%;
+    margin-top: 8px;
+}
+
+#personal-profile-status {
+    font-size: 12px;
+}

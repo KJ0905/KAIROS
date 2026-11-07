@@ -3,9 +3,9 @@ from pathlib import Path
 from uuid import uuid4
 
 from backend.config import DATA_DIR, UPLOAD_DIR
-from backend.schemas import Resume
+from backend.schemas import Resume, PersonalProfile
 
-
+PERSONAL_PROFILE_FILE = DATA_DIR / "personal_profile.json"
 PORTFOLIO_FILE = DATA_DIR / "portfolio.json"
 RESUME_FILE = DATA_DIR / "portfolio_resume.json"
 CONVERSATIONS_DIR = DATA_DIR / "conversations"
@@ -95,3 +95,40 @@ def save_conversation(conversation: dict) -> None:
         json.dumps(conversation, indent=2),
         encoding="utf-8",
     )
+
+
+def get_personal_profile() -> PersonalProfile:
+    if not PERSONAL_PROFILE_FILE.exists():
+        return PersonalProfile()
+
+    try:
+        data = json.loads(
+            PERSONAL_PROFILE_FILE.read_text(encoding="utf-8")
+        )
+        return PersonalProfile.model_validate(data)
+
+    except (json.JSONDecodeError, OSError, ValueError):
+        return PersonalProfile()
+
+
+def save_personal_profile(profile: PersonalProfile) -> dict:
+    DATA_DIR.mkdir(parents=True, exist_ok=True)
+
+    data = profile.model_dump(mode="json")
+
+    temporary_file = PERSONAL_PROFILE_FILE.with_suffix(".tmp")
+    temporary_file.write_text(
+        json.dumps(data, indent=2),
+        encoding="utf-8",
+    )
+    temporary_file.replace(PERSONAL_PROFILE_FILE)
+
+    return data
+
+
+def delete_personal_profile() -> bool:
+    if not PERSONAL_PROFILE_FILE.exists():
+        return False
+
+    PERSONAL_PROFILE_FILE.unlink()
+    return True

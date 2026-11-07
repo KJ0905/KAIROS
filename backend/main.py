@@ -31,6 +31,7 @@ from backend.schemas import (
     ChatRequest,
     JobMatchRequest,
     NewConversationRequest,
+    PersonalProfile,
     Resume,
 )
 from backend.storage import (
@@ -38,9 +39,12 @@ from backend.storage import (
     PORTFOLIO_FILE,
     create_conversation,
     delete_portfolio,
+    delete_personal_profile,
     get_conversation,
+    get_personal_profile,
     get_portfolio,
     save_conversation,
+    save_personal_profile,
     save_portfolio,
 )
 
@@ -200,6 +204,45 @@ def admin_portfolio(request: Request):
         "resume": portfolio.get("resume"),
     }
 
+@app.get("/api/admin/personal-profile")
+def admin_personal_profile(request: Request):
+    require_admin(request)
+
+    profile = get_personal_profile()
+
+    return {
+        "profile": profile.model_dump(mode="json")
+    }
+
+
+@app.put("/api/admin/personal-profile")
+def update_personal_profile(
+    profile: PersonalProfile,
+    request: Request,
+):
+    require_admin(request)
+
+    saved_profile = save_personal_profile(profile)
+
+    return {
+        "message": "Personal profile saved successfully.",
+        "profile": saved_profile,
+    }
+
+
+@app.delete("/api/admin/personal-profile")
+def remove_personal_profile(request: Request):
+    require_admin(request)
+
+    if not delete_personal_profile():
+        raise HTTPException(
+            status_code=404,
+            detail="No personal profile exists.",
+        )
+
+    return {
+        "message": "Personal profile deleted successfully."
+    }
 
 @app.post("/api/admin/resume")
 async def upload_resume(request: Request, file: UploadFile = File(...)):
