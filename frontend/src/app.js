@@ -309,24 +309,50 @@ function renderMarkdown(text) {
     return html;
 }
 
+// function addMessage(role, content) {
+//     const message = document.createElement("div");
+//     message.className = `message ${role}`;
+
+//     const avatar = document.createElement("div");
+//     avatar.className = "message-avatar";
+//     //avatar.textContent = role === "user" ? "YOU" : "AI";
+
+//     const body = document.createElement("div");
+//     body.className = "message-content";
+
+//     if (role === "assistant") {
+//         body.innerHTML = renderMarkdown(content);
+//     } else {
+//         body.textContent = content;
+//     }
+
+//     message.append(avatar, body);
+//     chatMessages.appendChild(message);
+//     chatMessages.scrollTop = chatMessages.scrollHeight;
+
+//     return message;
+// }
+
+
 function addMessage(role, content) {
     const message = document.createElement("div");
     message.className = `message ${role}`;
-
-    const avatar = document.createElement("div");
-    avatar.className = "message-avatar";
-    //avatar.textContent = role === "user" ? "YOU" : "AI";
 
     const body = document.createElement("div");
     body.className = "message-content";
 
     if (role === "assistant") {
         body.innerHTML = renderMarkdown(content);
+
+        const avatar = document.createElement("div");
+        avatar.className = "message-avatar";
+
+        message.append(avatar, body);
     } else {
         body.textContent = content;
+        message.appendChild(body);
     }
 
-    message.append(avatar, body);
     chatMessages.appendChild(message);
     chatMessages.scrollTop = chatMessages.scrollHeight;
 
