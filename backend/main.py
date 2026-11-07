@@ -392,8 +392,11 @@ def chat(request: ChatRequest):
 
     def stream_response():
         try:
+            personal_profile = get_personal_profile()
+
             answer = generate_answer(
                 resume=resume,
+                personal_profile=personal_profile,
                 conversation_history=history,
                 question=request.question,
             )
