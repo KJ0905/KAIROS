@@ -19,6 +19,7 @@ from backend.config import (
     UPLOAD_DIR,
 )
 from backend.job_matcher import calculate_job_match
+from backend.jd_analyzer import analyze_job_description
 from backend.resume_parser import (
     categorize_urls,
     extract_pdf_links,
@@ -428,8 +429,24 @@ def chat(request: ChatRequest):
 
 @app.post("/api/job-match")
 def job_match(request: JobMatchRequest):
+    # Get the user's saved resume and personal knowledge base
     resume = get_active_resume()
-    return calculate_job_match(resume, request.job_description)
+    personal_profile = get_personal_profile()
+
+    # Step 1: Use AI to understand and extract requirements from the JD
+    job_analysis = analyze_job_description(request.job_description)
+
+    # Step 2: Use Python to compare extracted requirements with the profile
+    result = calculate_job_match(
+        resume=resume,
+        job_analysis=job_analysis,
+        personal_profile=personal_profile,
+    )
+
+    # Include the AI analysis in the response for transparency
+    result["jd_analysis"] = job_analysis.model_dump(mode="json")
+
+    return result
 
 @app.get("/api/portfolio/resume")
 def view_current_resume():

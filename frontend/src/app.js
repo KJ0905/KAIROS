@@ -309,29 +309,210 @@ function renderMarkdown(text) {
     return html;
 }
 
-// function addMessage(role, content) {
-//     const message = document.createElement("div");
-//     message.className = `message ${role}`;
 
-//     const avatar = document.createElement("div");
-//     avatar.className = "message-avatar";
-//     //avatar.textContent = role === "user" ? "YOU" : "AI";
+function renderMatchList(items, emptyMessage = "No items found.") {
+    if (!Array.isArray(items) || items.length === 0) {
+        return `<p class="match-empty">${escapeHTML(emptyMessage)}</p>`;
+    }
 
-//     const body = document.createElement("div");
-//     body.className = "message-content";
+    return `
+        <div class="match-chip-list">
+            ${items.map(item => `
+                <span class="match-chip">
+                    ${escapeHTML(item)}
+                </span>
+            `).join("")}
+        </div>
+    `;
+}
 
-//     if (role === "assistant") {
-//         body.innerHTML = renderMarkdown(content);
-//     } else {
-//         body.textContent = content;
-//     }
+// function renderScoreCard(title, score, description, className) {
+//     const value = Math.max(0, Math.min(100, Number(score) || 0));
 
-//     message.append(avatar, body);
-//     chatMessages.appendChild(message);
-//     chatMessages.scrollTop = chatMessages.scrollHeight;
+//     return `
+//         <div class="match-score-card ${className}">
+//             <div class="match-card-heading">
+//                 <span>${escapeHTML(title)}</span>
+//                 <strong>${value.toFixed(0)}%</strong>
+//             </div>
 
-//     return message;
+//             <div class="match-progress-track">
+//                 <div
+//                     class="match-progress-fill"
+//                     style="width: ${value}%">
+//                 </div>
+//             </div>
+
+//             <p>${escapeHTML(description)}</p>
+//         </div>
+//     `;
 // }
+// function renderScoreCard(title, score, description, className = "") {
+//     const safeScore = Math.max(0, Math.min(100, Number(score) || 0));
+
+//     const fillColor = className === "technical-fill"
+//         ? "#3b82f6"
+//         : className === "personal-fill"
+//             ? "#8b5cf6"
+//             : "#10b981";
+
+//     return `
+//         <div class="match-score-card">
+//             <div class="match-card-heading">
+//                 <strong>${escapeHTML(title)}</strong>
+//                 <strong>${safeScore}%</strong>
+//             </div>
+
+//             <div class="match-progress-track">
+//                 <div
+//                     class="match-progress-fill ${className}"
+//                     style="width: ${safeScore}%; background-color: ${fillColor} !important;"
+//                 ></div>
+//             </div>
+
+//             <p>${escapeHTML(description)}</p>
+//         </div>
+//     `;
+// }
+function renderScoreCard(title, score, description) {
+    const safeScore = Math.max(0, Math.min(100, Number(score) || 0));
+
+    let fillColor = "#10b981"; // Green: Role Suitability
+
+    if (title.toLowerCase().includes("technical")) {
+        fillColor = "#3b82f6"; // Blue
+    } else if (title.toLowerCase().includes("personal")) {
+        fillColor = "#8b5cf6"; // Purple
+    }
+
+    return `
+        <div class="match-score-card">
+            <div class="match-card-heading">
+                <strong>${escapeHTML(title)}</strong>
+                <strong>${safeScore}%</strong>
+            </div>
+
+            <div class="match-progress-track">
+                <div
+                    class="match-progress-fill"
+                    style="width: ${safeScore}%; background: ${fillColor} !important;"
+                ></div>
+            </div>
+
+            <p>${escapeHTML(description)}</p>
+        </div>
+    `;
+}
+
+function renderEvidenceSection(title, evidenceItems) {
+    if (!Array.isArray(evidenceItems) || evidenceItems.length === 0) {
+        return "";
+    }
+
+    return `
+        <section class="match-result-section">
+            <h3>${escapeHTML(title)}</h3>
+
+            <div class="match-evidence-list">
+                ${evidenceItems.map(item => `
+                    <article class="match-evidence-card">
+                        <div class="match-evidence-heading">
+                            <strong>${escapeHTML(item.skill)}</strong>
+                            <span class="match-importance">
+                                ${escapeHTML(item.importance || "medium")} priority
+                            </span>
+                        </div>
+
+                        ${(item.evidence || []).map(entry => `
+                            <div class="match-evidence-item">
+                                <div class="match-evidence-meta">
+                                    <span>${escapeHTML(entry.source)}</span>
+                                    <strong>${escapeHTML(entry.title)}</strong>
+                                </div>
+
+                                <p>${escapeHTML(entry.snippet)}</p>
+
+                                <small>
+                                    Matched phrase:
+                                    ${escapeHTML(entry.matched_phrase)}
+                                </small>
+                            </div>
+                        `).join("")}
+                    </article>
+                `).join("")}
+            </div>
+        </section>
+    `;
+}
+
+function renderDevelopmentOpportunities(items) {
+    if (!Array.isArray(items) || items.length === 0) {
+        return `
+            <p class="match-empty">
+                No specific development opportunities identified.
+            </p>
+        `;
+    }
+
+    return `
+        <div class="match-opportunity-list">
+            ${items.map(item => `
+                <article class="match-opportunity-card">
+                    <div class="match-evidence-heading">
+                        <strong>${escapeHTML(item.skill)}</strong>
+                        <span class="match-importance">
+                            ${escapeHTML(item.importance || "medium")} priority
+                        </span>
+                    </div>
+
+                    <p>${escapeHTML(item.description || "")}</p>
+
+                    <div class="match-suggestion">
+                        <strong>Suggested action</strong>
+                        <p>${escapeHTML(item.suggestion || "")}</p>
+                    </div>
+                </article>
+            `).join("")}
+        </div>
+    `;
+}
+
+function renderResponsibilities(items) {
+    if (!Array.isArray(items) || items.length === 0) {
+        return "";
+    }
+
+    return `
+        <section class="match-result-section">
+            <h3>Matched Responsibilities</h3>
+            ${renderMatchList(items)}
+        </section>
+    `;
+}
+
+
+function renderRequirementList(items) {
+    if (!Array.isArray(items) || items.length === 0) {
+        return `<p class="match-empty">No requirements extracted.</p>`;
+    }
+
+    return `
+        <div class="match-requirement-list">
+            ${items.map(item => `
+                <div class="match-requirement-item">
+                    <div>
+                        <strong>${escapeHTML(item.skill)}</strong>
+                        <span class="match-importance">
+                            ${escapeHTML(item.importance || "medium")}
+                        </span>
+                    </div>
+                    <p>${escapeHTML(item.description || "")}</p>
+                </div>
+            `).join("")}
+        </div>
+    `;
+}
+
 
 
 function addMessage(role, content) {
@@ -390,34 +571,35 @@ async function readJsonResponse(response) {
 
 
 async function loadCandidates() {
-    try {
-        const response = await fetch(`${API_BASE}/api/portfolio`);
-        const data = await readJsonResponse(response);
+    // try {
+    //     const response = await fetch(`${API_BASE}/api/portfolio`);
+    //     const data = await readJsonResponse(response);
 
-        candidateList.replaceChildren();
+    //     candidateList.replaceChildren();
 
-        if (!data.available) {
-            candidateList.textContent = "Portfolio resume not uploaded yet.";
-            return;
-        }
+    //     if (!data.available) {
+    //         candidateList.textContent = "Portfolio resume not uploaded yet.";
+    //         return;
+    //     }
 
-        const item = document.createElement("div");
-        item.className = "candidate-item";
+    //     const item = document.createElement("div");
+    //     item.className = "candidate-item";
 
-        const name = document.createElement("div");
-        name.textContent = data.name || "Portfolio Owner";
-        name.className = "candidate-name";
+    //     const name = document.createElement("div");
+    //     name.textContent = data.name || "Portfolio Owner";
+    //     name.className = "candidate-name";
 
-        const skills = document.createElement("div");
-        skills.textContent = (data.skills || []).join(", ");
-        skills.className = "candidate-skills";
+    //     const skills = document.createElement("div");
+    //     skills.textContent = (data.skills || []).join(", ");
+    //     skills.className = "candidate-skills";
 
-        item.append(name, skills);
-        candidateList.appendChild(item);
-    } catch (error) {
-        console.error("Could not load portfolio:", error);
-        candidateList.textContent = "Could not load portfolio.";
-    }
+    //     item.append(name, skills);
+    //     candidateList.appendChild(item);
+    // } catch (error) {
+    //     console.error("Could not load portfolio:", error);
+    //     candidateList.textContent = "Could not load portfolio.";
+    // }
+    return
 }
 
 
@@ -837,13 +1019,167 @@ document.querySelectorAll(".suggestion").forEach((button) => {
     });
 });
 
+// $("#match-btn")?.addEventListener("click", async () => {
+//     console.log("JOB MATCH BUTTON CLICKED");
+
+//     const description = jobDescription.value.trim();
+
+//     if (!description) {
+//         matchStatus.textContent = "Enter a job description first.";
+//         return;
+//     }
+
+//     matchStatus.textContent = "Analyzing job match...";
+//     matchResults.replaceChildren();
+
+//     try {
+//         const response = await fetch(`${API_BASE}/api/job-match`, {
+//             method: "POST",
+//             headers: {
+//                 "Content-Type": "application/json"
+//             },
+//             credentials: "same-origin",
+//             body: JSON.stringify({
+//                 job_description: description
+//             })
+//         });
+
+//         const data = await readJsonResponse(response);
+
+//         console.log("JOB MATCH API RESPONSE:", data);
+//         matchStatus.textContent = "Analysis complete.";
+
+//         // Extract scores safely
+//         const getScore = (value) => {
+//             const number = Number(value);
+//             return Number.isFinite(number)
+//                 ? Math.max(0, Math.min(100, number))
+//                 : 0;
+//         };
+
+//         const overallScore = getScore(data.match_score);
+//         const technicalScore = getScore(data.technical_match_score);
+//         const personalScore = getScore(data.personal_match_score);
+
+//         // Match verdict
+//         const getMatchVerdict = (score) => {
+//             if (score >= 80) return "Excellent Match";
+//             if (score >= 65) return "Strong Match";
+//             if (score >= 45) return "Moderate Match";
+//             return "Low Match";
+//         };
+
+//         // Build dashboard
+//         matchResults.innerHTML = `
+//             <div class="match-dashboard">
+
+//                 <!-- Overall score -->
+//                 <div class="match-overall-card">
+
+//                     <div class="match-score-ring"
+//                          style="--score: ${overallScore}%">
+
+//                         <div class="match-score-inner">
+//                             <strong>${overallScore.toFixed(0)}%</strong>
+//                             <span>Overall Match</span>
+//                         </div>
+
+//                     </div>
+
+//                     <div class="match-overall-info">
+//                         <h3>${getMatchVerdict(overallScore)}</h3>
+//                         <p>
+//                             Overall compatibility based on the candidate's
+//                             resume and Personal Knowledge Base.
+//                         </p>
+//                     </div>
+
+//                 </div>
+
+//                 <!-- Score breakdown -->
+//                 <h3 class="match-section-title">
+//                     Score Breakdown
+//                 </h3>
+
+//                 <div class="match-breakdown-grid">
+
+//                     <!-- Technical skills -->
+//                     <div class="match-score-card technical-card">
+
+//                         <div class="match-card-heading">
+//                             <span class="match-card-icon">⚙️</span>
+//                             <span>Technical Skills</span>
+//                         </div>
+
+//                         <strong class="match-card-score">
+//                             ${technicalScore.toFixed(0)}%
+//                         </strong>
+
+//                         <div class="match-progress-track">
+//                             <div
+//                                 class="match-progress-fill technical-fill"
+//                                 style="width: ${technicalScore}%">
+//                             </div>
+//                         </div>
+
+//                         <p>
+//                             Based on technical skills, projects and
+//                             experience extracted from the resume.
+//                         </p>
+
+//                     </div>
+
+//                     <!-- Personal skills -->
+//                     <div class="match-score-card personal-card">
+
+//                         <div class="match-card-heading">
+//                             <span class="match-card-icon">🧠</span>
+//                             <span>Personal Skills</span>
+//                         </div>
+
+//                         <strong class="match-card-score">
+//                             ${personalScore.toFixed(0)}%
+//                         </strong>
+
+//                         <div class="match-progress-track">
+//                             <div
+//                                 class="match-progress-fill personal-fill"
+//                                 style="width: ${personalScore}%">
+//                             </div>
+//                         </div>
+
+//                         <p>
+//                             Based on strengths, communication, teamwork,
+//                             leadership and problem-solving from the
+//                             Personal Knowledge Base.
+//                         </p>
+
+//                     </div>
+
+//                 </div>
+
+//                 <!-- Recruiter assessment -->
+//                 ${data.explanation ? `
+//                     <div class="match-assessment">
+//                         <h3>Recruiter Assessment</h3>
+//                         <p>${escapeHTML(data.explanation)}</p>
+//                     </div>
+//                 ` : ""}
+
+//             </div>
+//         `;
+
+//     } catch (error) {
+//         console.error("Job matching failed:", error);
+
+//         matchStatus.textContent =
+//             error.message || "Unable to analyze this job description.";
+//     }
+// });
+
+
 $("#match-btn")?.addEventListener("click", async () => {
     const description = jobDescription.value.trim();
-
-    // if (!state.conversationId) {
-    //     matchStatus.textContent = "Please start a chat first.";
-    //     return;
-    // }
 
     if (!description) {
         matchStatus.textContent = "Enter a job description first.";
@@ -853,78 +1189,239 @@ $("#match-btn")?.addEventListener("click", async () => {
     matchStatus.textContent = "Analyzing job match...";
     matchResults.replaceChildren();
 
-        try {
-            const response = await fetch(`${API_BASE}/api/job-match`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                credentials: "same-origin",
-                body: JSON.stringify({
-                    job_description: description
+    const matchButton = $("#match-btn");
+    matchButton.disabled = true;
+
+    try {
+        const response = await fetch(`${API_BASE}/api/job-match`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            credentials: "same-origin",
+            body: JSON.stringify({
+                job_description: description
             })
         });
 
-
         const data = await readJsonResponse(response);
+
+        console.log("JOB MATCH API RESPONSE:", data);
+
+        const overallScore = Number(data.match_score) || 0;
+        const technicalScore = Number(data.technical_match_score) || 0;
+        const personalScore = Number(data.personal_match_score) || 0;
+        const roleScore = Number(data.role_match_score) || 0;
+
+        const verdict = data.verdict || "Match Analysis";
+
+        const technicalEvidence = data.technical_evidence || [];
+        const personalEvidence = data.personal_evidence || [];
+
+        const developmentDetails =
+            data.development_opportunity_details || [];
+
+        const jd = data.jd_analysis || {};
+
+        matchResults.innerHTML = `
+            <div class="match-dashboard">
+
+                <!-- OVERALL RESULT -->
+                <section class="match-overall-card">
+
+                    <div class="match-score-ring"
+                         style="--score: ${Math.max(0, Math.min(100, overallScore))}%">
+
+                        <div class="match-score-inner">
+                            <strong>${overallScore.toFixed(0)}%</strong>
+                            <span>Overall Match</span>
+                        </div>
+
+                    </div>
+
+                    <div class="match-overall-info">
+                        <span class="match-eyebrow">JOB COMPATIBILITY</span>
+                        <h3>${escapeHTML(verdict)}</h3>
+                        <p>${escapeHTML(data.explanation || "")}</p>
+                    </div>
+
+                </section>
+
+                <!-- ROLE INFORMATION -->
+                <section class="match-role-card">
+                    <span class="match-eyebrow">TARGET ROLE</span>
+                    <h3>${escapeHTML(data.role || jd.role_title || "Not specified")}</h3>
+                    <p>
+                        Category:
+                        <strong>${escapeHTML(data.role_category || jd.role_category || "Not specified")}</strong>
+                    </p>
+                    <p>
+                        Seniority:
+                        <strong>${escapeHTML(jd.seniority || "Not specified")}</strong>
+                    </p>
+                </section>
+
+                <!-- SCORE BREAKDOWN -->
+                <section class="match-result-section">
+                    <h3>Score Breakdown</h3>
+
+                    <div class="match-breakdown-grid">
+
+                        ${renderScoreCard(
+                            "Technical Match",
+                            technicalScore,
+                            "Skills, projects and technical experience.",
+                            "technical-card"
+                        )}
+
+                        ${renderScoreCard(
+                            "Personal Skills Match",
+                            personalScore,
+                            "Soft skills and personal experience.",
+                            "personal-card"
+                        )}
+
+                        ${renderScoreCard(
+                            "Role Suitability",
+                            roleScore,
+                            "Combined suitability for this position.",
+                            "role-card"
+                        )}
+
+                    </div>
+                </section>
+
+                <!-- MATCHED TECHNICAL SKILLS -->
+                <section class="match-result-section">
+                    <h3>Matched Technical Skills</h3>
+                    ${renderMatchList(data.matched_technical_skills)}
+                </section>
+
+                <!-- RELATED SKILLS -->
+                <section class="match-result-section">
+                    <h3>Related Skills</h3>
+                    <p class="match-section-description">
+                        Relevant technologies found in the resume.
+                        These do not directly contribute to the match score.
+                    </p>
+                    ${renderMatchList(data.related_skills, "No related skills identified.")}
+                </section>
+
+                <!-- MATCHED PERSONAL SKILLS -->
+                <section class="match-result-section">
+                    <h3>Matched Personal Skills</h3>
+                    ${renderMatchList(data.matched_soft_skills)}
+                </section>
+
+                <!-- DEVELOPMENT OPPORTUNITIES -->
+                <section class="match-result-section">
+                    <h3>Development Opportunities</h3>
+                    ${renderDevelopmentOpportunities(developmentDetails)}
+                </section>
+
+                <!-- MISSING PERSONAL SKILLS -->
+                <section class="match-result-section">
+                    <h3>Personal Skills to Develop</h3>
+                    ${renderMatchList(data.missing_personal_skills, "No missing personal skills identified.")}
+                </section>
+
+                <!-- TECHNICAL EVIDENCE -->
+                ${renderEvidenceSection(
+                    "Technical Evidence",
+                    technicalEvidence
+                )}
+
+                <!-- PERSONAL EVIDENCE -->
+                ${renderEvidenceSection(
+                    "Personal Skills Evidence",
+                    personalEvidence
+                )}
+
+                <!-- RESPONSIBILITIES -->
+                ${renderResponsibilities(data.matched_responsibilities)}
+
+                <!-- ROLE ASSESSMENT -->
+                <section class="match-result-section">
+                    <h3>Role Assessment</h3>
+                    <div class="match-assessment">
+                        <p>${escapeHTML(data.role_assessment || "No role assessment available.")}</p>
+                    </div>
+                </section>
+
+                <!-- JOB DESCRIPTION ANALYSIS -->
+                <details class="match-jd-details">
+                    <summary>View extracted job requirements</summary>
+
+                    <div class="match-jd-content">
+
+                        <h4>Technical Requirements</h4>
+                        ${renderRequirementList(jd.technical_requirements)}
+
+                        <h4>Personal Skills Requirements</h4>
+                        ${renderRequirementList(jd.soft_skill_requirements)}
+
+                        <h4>Responsibilities</h4>
+                        ${renderMatchList(jd.responsibilities)}
+
+                        ${jd.education_requirement ? `
+                            <p>
+                                <strong>Education:</strong>
+                                ${escapeHTML(jd.education_requirement)}
+                            </p>
+                        ` : ""}
+
+                        ${jd.experience_requirement ? `
+                            <p>
+                                <strong>Experience:</strong>
+                                ${escapeHTML(jd.experience_requirement)}
+                            </p>
+                        ` : ""}
+
+                        ${jd.non_relevant_information?.length ? `
+                            <h4>Ignored Information</h4>
+                            ${renderMatchList(jd.non_relevant_information)}
+                        ` : ""}
+
+                    </div>
+                </details>
+
+                <p class="match-disclaimer">
+                    This score is an indicative assessment based on the
+                    extracted job requirements and available candidate
+                    information. It is not a prediction of hiring probability.
+                </p>
+
+            </div>
+        `;
 
         matchStatus.textContent = "Analysis complete.";
 
-        const score = data.score ?? data.match_score;
-
-        if (score !== undefined) {
-            const scoreElement = document.createElement("h3");
-            scoreElement.textContent = `Match score: ${score}%`;
-            matchResults.appendChild(scoreElement);
-        }
-
-        const sections = [
-            ["Matched skills", data.matched_skills || data.matching_skills],
-            ["Missing skills", data.missing_skills],
-            ["Recommendations", data.recommendations]
-        ];
-
-        sections.forEach(([heading, items]) => {
-            if (!items || items.length === 0) return;
-
-            const section = document.createElement("section");
-            const title = document.createElement("h4");
-            title.textContent = heading;
-            section.appendChild(title);
-
-            if (Array.isArray(items)) {
-                const list = document.createElement("ul");
-
-                items.forEach((item) => {
-                    const li = document.createElement("li");
-                    li.textContent =
-                        typeof item === "string"
-                            ? item
-                            : JSON.stringify(item);
-                    list.appendChild(li);
-                });
-
-                section.appendChild(list);
-            } else {
-                const paragraph = document.createElement("p");
-                paragraph.textContent = String(items);
-                section.appendChild(paragraph);
-            }
-
-            matchResults.appendChild(section);
-        });
-
-        if (!matchResults.children.length) {
-            const result = document.createElement("pre");
-            result.textContent = JSON.stringify(data, null, 2);
-            matchResults.appendChild(result);
-        }
     } catch (error) {
         console.error("Job matching failed:", error);
+
         matchStatus.textContent =
             error.message || "Unable to analyze this job description.";
+
+    } finally {
+        matchButton.disabled = false;
     }
 });
+
+
+$("#clear-job-btn")?.addEventListener("click", () => {
+    // Clear the job description
+    jobDescription.value = "";
+
+    // Clear previous results
+    matchResults.replaceChildren();
+
+    // Clear status message
+    matchStatus.textContent = "";
+
+    // Put cursor back in the textarea
+    jobDescription.focus();
+});
+
 
 questionInput.addEventListener("keydown", (event) => {
     if (event.key === "Enter" && !event.shiftKey) {
@@ -933,7 +1430,7 @@ questionInput.addEventListener("keydown", (event) => {
     }
 });
 
-loadCandidates();
+//loadCandidates();
 ensureConversation().catch(console.error);
 
 // Admin panel

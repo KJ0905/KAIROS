@@ -88,6 +88,49 @@ class NewConversationRequest(BaseModel):
 class JobMatchRequest(BaseModel):
     job_description: str = Field(min_length=30, max_length=12000)
 
+# --------------------------------------------------
+# Job Description Analysis Schemas
+# --------------------------------------------------
+
+class JDRequirement(BaseModel):
+    skill: str
+    importance: str = "medium"  # high, medium, low
+    description: str | None = None
+
+
+class JDAnalysis(BaseModel):
+    role_title: str
+    role_category: str
+    seniority: str | None = None
+
+    # Technical requirements extracted from the JD
+    technical_requirements: list[JDRequirement] = Field(
+        default_factory=list
+    )
+
+    # Personal and soft skill requirements
+    soft_skill_requirements: list[JDRequirement] = Field(
+        default_factory=list
+    )
+
+    # Responsibilities converted into relevant capabilities
+    responsibilities: list[str] = Field(
+        default_factory=list
+    )
+
+    # Education and experience requirements
+    education_requirement: str | None = None
+    experience_requirement: str | None = None
+
+    # Information that should not affect matching scores
+    non_relevant_information: list[str] = Field(
+        default_factory=list
+    )
+
+
+class JDAnalysisResponse(BaseModel):
+    analysis: JDAnalysis
+    analysis_summary: str | None = None
 
 class AdminLoginRequest(BaseModel):
     username: str = Field(min_length=1, max_length=100)

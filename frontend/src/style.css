@@ -1415,3 +1415,612 @@ body {
 #personal-profile-status {
     font-size: 12px;
 }
+
+/* Make the Job Matcher panel independently scrollable */
+.job-panel {
+    max-height: calc(100dvh - 100px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+}
+
+/* Keep the Job Matcher header visible while scrolling */
+.job-panel-header {
+    position: sticky;
+    top: -16px;
+    z-index: 5;
+    background: var(--panel);
+    padding: 8px 0;
+}
+
+/* Give long match results enough room */
+#match-results {
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+
+/* ================================
+   JOB MATCH DASHBOARD
+================================ */
+
+.match-dashboard {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    padding: 16px 4px;
+    color: var(--text);
+}
+
+.match-overall-card {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    padding: 24px;
+    border-radius: 18px;
+    background: linear-gradient(
+        120deg,
+        rgba(99, 102, 241, 0.13),
+        rgba(168, 85, 247, 0.10)
+    );
+    border: 1px solid rgba(139, 92, 246, 0.25);
+}
+
+.match-score-ring {
+    --score: 0%;
+
+    width: 142px;
+    height: 142px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: conic-gradient(
+        #8b5cf6 var(--score),
+        rgba(148, 163, 184, 0.20) var(--score)
+    );
+}
+
+.match-score-inner {
+    width: 112px;
+    height: 112px;
+    border-radius: 50%;
+    background: var(--panel);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.match-score-inner strong {
+    font-size: 30px;
+    font-weight: 800;
+}
+
+.match-score-inner span {
+    font-size: 11px;
+    opacity: 0.7;
+}
+
+.match-overall-info h3 {
+    margin: 0 0 8px;
+    font-size: 23px;
+}
+
+.match-overall-info p,
+.match-score-card p,
+.match-assessment p {
+    font-size: 13px;
+    line-height: 1.6;
+    opacity: 0.75;
+}
+
+.match-section-title {
+    margin: 0;
+    font-size: 17px;
+}
+
+.match-breakdown-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.match-score-card {
+    padding: 18px;
+    border-radius: 16px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    min-width: 0;
+}
+
+.match-card-heading {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.match-card-icon {
+    font-size: 20px;
+}
+
+.match-card-score {
+    display: block;
+    font-size: 30px;
+    margin: 18px 0 12px;
+}
+
+.match-progress-track {
+    height: 9px;
+    width: 100%;
+    border-radius: 20px;
+    overflow: hidden;
+    background: rgba(148, 163, 184, 0.2);
+}
+
+.match-progress-fill {
+    height: 100%;
+    border-radius: inherit;
+    transition: width 0.7s ease;
+}
+
+.technical-fill {
+    background: linear-gradient(90deg, #3b82f6, #06b6d4);
+}
+
+.personal-fill {
+    background: linear-gradient(90deg, #a855f7, #ec4899);
+}
+
+.match-assessment {
+    padding: 18px;
+    border-radius: 14px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+}
+
+.match-assessment h3 {
+    margin: 0 0 8px;
+    font-size: 16px;
+}
+
+.match-assessment p {
+    margin: 0;
+}
+
+@media (max-width: 600px) {
+    .match-overall-card {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .match-breakdown-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.job-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.clear-job-btn {
+    padding: 10px 18px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: transparent;
+    color: var(--text);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.clear-job-btn:hover {
+    background: var(--border);
+}
+
+
+/* =========================================
+   JOB MATCHER - DETAILED RESULTS
+========================================= */
+
+/* Common result sections */
+.match-result-section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-width: 0;
+}
+
+.match-result-section > h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 650;
+    letter-spacing: -0.2px;
+}
+
+.match-section-description {
+    margin: -5px 0 2px;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.match-empty {
+    color: var(--muted);
+    font-size: 12px;
+    margin: 0;
+}
+
+/* Eyebrow labels */
+.match-eyebrow {
+    display: block;
+    color: var(--muted);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    margin-bottom: 7px;
+}
+
+/* Overall result improvements */
+.match-overall-card {
+    flex-wrap: wrap;
+    min-width: 0;
+}
+
+.match-overall-info {
+    flex: 1;
+    min-width: 180px;
+}
+
+.match-overall-info h3 {
+    overflow-wrap: anywhere;
+}
+
+/* Role information */
+.match-role-card {
+    padding: 18px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--panel);
+}
+
+.match-role-card h3 {
+    font-size: 19px;
+    margin: 0 0 12px;
+    font-weight: 650;
+}
+
+.match-role-card p {
+    margin: 6px 0 0;
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.6;
+}
+
+.match-role-card strong {
+    color: var(--text);
+    font-weight: 600;
+}
+
+/* Score cards */
+.match-score-card {
+    min-width: 0;
+}
+
+.match-card-heading {
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.match-card-heading > strong {
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.match-score-card p {
+    margin: 12px 0 0;
+}
+
+.role-card .match-progress-fill {
+    background: linear-gradient(90deg, #10b981, #14b8a6);
+}
+
+/* Skill chips */
+.match-chip-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.match-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 7px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--panel);
+    color: var(--text);
+    font-size: 12px;
+    font-weight: 500;
+    overflow-wrap: anywhere;
+    max-width: 100%;
+}
+
+/* Evidence cards */
+.match-evidence-list {
+    display: grid;
+    gap: 12px;
+}
+
+.match-evidence-card {
+    padding: 15px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--panel);
+    min-width: 0;
+}
+
+.match-evidence-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.match-evidence-heading > strong {
+    font-size: 13px;
+    font-weight: 650;
+}
+
+.match-importance {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 8px;
+    border-radius: 20px;
+    background: var(--hover);
+    color: var(--muted);
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+.match-evidence-item {
+    margin-top: 13px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+}
+
+.match-evidence-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    margin-bottom: 7px;
+}
+
+.match-evidence-meta span {
+    color: var(--muted);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+}
+
+.match-evidence-meta strong {
+    font-size: 12px;
+}
+
+.match-evidence-item p {
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.65;
+    color: var(--text);
+}
+
+.match-evidence-item small {
+    display: block;
+    margin-top: 8px;
+    color: var(--muted);
+    font-size: 10px;
+    overflow-wrap: anywhere;
+}
+
+/* Development opportunities */
+.match-opportunity-list {
+    display: grid;
+    gap: 10px;
+}
+
+.match-opportunity-card {
+    padding: 15px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--panel);
+}
+
+.match-opportunity-card > p {
+    margin: 10px 0;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.match-suggestion {
+    padding: 11px;
+    border-radius: 9px;
+    background: var(--hover);
+}
+
+.match-suggestion strong {
+    font-size: 11px;
+}
+
+.match-suggestion p {
+    margin: 5px 0 0;
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--text);
+}
+
+/* Recruiter and role assessment */
+.match-assessment {
+    min-width: 0;
+}
+
+.match-assessment p {
+    color: var(--text);
+    opacity: 0.85;
+}
+
+/* Extracted JD requirements */
+.match-jd-details {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--panel);
+    overflow: hidden;
+}
+
+.match-jd-details summary {
+    padding: 15px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 650;
+    list-style-position: inside;
+}
+
+.match-jd-details summary:hover {
+    background: var(--hover);
+}
+
+.match-jd-content {
+    padding: 15px;
+    border-top: 1px solid var(--border);
+    display: grid;
+    gap: 12px;
+}
+
+.match-jd-content h4 {
+    margin: 5px 0 0;
+    font-size: 13px;
+    font-weight: 650;
+}
+
+.match-jd-content > p {
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+/* Individual JD requirements */
+.match-requirement-list {
+    display: grid;
+    gap: 8px;
+}
+
+.match-requirement-item {
+    padding: 11px;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    background: var(--bg);
+}
+
+.match-requirement-item > div {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.match-requirement-item strong {
+    font-size: 12px;
+}
+
+.match-requirement-item p {
+    margin: 6px 0 0;
+    color: var(--muted);
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+/* Disclaimer */
+.match-disclaimer {
+    margin: 0;
+    padding: 10px 12px;
+    border-left: 3px solid var(--border);
+    color: var(--muted);
+    font-size: 10px;
+    line-height: 1.6;
+}
+
+/* Loading and disabled states */
+#match-btn:disabled {
+    opacity: 0.55;
+    cursor: wait;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 600px) {
+    .match-dashboard {
+        gap: 16px;
+        padding: 12px 0;
+    }
+
+    .match-overall-card {
+        padding: 18px;
+        gap: 16px;
+    }
+
+    .match-score-ring {
+        width: 125px;
+        height: 125px;
+    }
+
+    .match-score-inner {
+        width: 99px;
+        height: 99px;
+    }
+
+    .match-score-inner strong {
+        font-size: 26px;
+    }
+
+    .match-overall-info h3 {
+        font-size: 20px;
+    }
+
+    .match-role-card,
+    .match-evidence-card,
+    .match-opportunity-card {
+        padding: 13px;
+    }
+
+    .match-chip {
+        font-size: 11px;
+        padding: 6px 9px;
+    }
+
+    .match-evidence-heading {
+        align-items: flex-start;
+    }
+}
+
+
+/* Fix progress bar colors in score breakdown */
+.technical-fill,
+.personal-fill {
+    background: linear-gradient(90deg, #10b981, #14b8a6);
+}
+
+.match-progress-fill {
+    height: 100%;
+    border-radius: 999px;
+    transition: width 0.4s ease;
+}
+
+.technical-fill,
+.personal-fill {
+    background: #10b981 !important;
+}
